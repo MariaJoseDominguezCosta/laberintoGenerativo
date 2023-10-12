@@ -1,13 +1,6 @@
 // laberintogenerativo/models/powers.go
 package models
 
-type powerType int
-
-type Power struct {
-	Position
-	Kind powerType
-}
-
 const (
 	Life powerType = iota
 	Invincibility

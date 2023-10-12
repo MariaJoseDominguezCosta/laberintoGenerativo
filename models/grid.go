@@ -2,26 +2,34 @@
 package models
 
 import (
+	"image/color"
+	"laberintogenerativo/resources"
+	"laberintogenerativo/utils"
+
 	"github.com/golang/freetype/truetype"
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/text"
 	"golang.org/x/image/font"
-	"image/color"
-	"laberintogenerativo/resources"
-	"laberintogenerativo/utils"
 )
 
-const GridViewSize = 1024
+const GridViewSize = 1000
 
 var GrayColor = color.RGBA{236, 240, 241, 255.0}
 
-func GridView(characters *resources.Characters, powers *resources.Powers, arcadeFont *truetype.Font, mazeView func(mode Mode, data *Data) (*ebiten.Image, error)) (func(mode Mode, data *Data) (*ebiten.Image, error), error) {
+func GridView(
+	characters *resources.Characters,
+	powers *resources.Powers,
+	arcadeFont *truetype.Font,
+	mazeView func(state Mode, data *Data) (*ebiten.Image, error),
+) (func(state Mode, data *Data) (*ebiten.Image, error), error) {
 	fontface := truetype.NewFace(arcadeFont, &truetype.Options{
 		Size:    32,
 		DPI:     72,
 		Hinting: font.HintingFull,
 	})
+
 	limeAlpha := color.RGBA{250, 233, 8, 200}
+
 	dot, dotErr := ebiten.NewImage(8, 8, ebiten.FilterDefault)
 	if dotErr != nil {
 		return nil, dotErr
@@ -61,7 +69,7 @@ func GridView(characters *resources.Characters, powers *resources.Powers, arcade
 	if viewErr != nil {
 		return nil, viewErr
 	}
-	return func(mode Mode, data *Data) (*ebiten.Image, error) {
+	return func(state Mode, data *Data) (*ebiten.Image, error) {
 		if clearErr := view.Clear(); clearErr != nil {
 			return nil, clearErr
 		}
@@ -69,18 +77,19 @@ func GridView(characters *resources.Characters, powers *resources.Powers, arcade
 			return nil, fillErr
 		}
 		ops := &ebiten.DrawImageOptions{}
-		switch mode {
+		switch state {
 		case GameLoading:
 			text.Draw(view, "PRESS SPACE", fontface, 320-176, 512-(10+32), color.White)
-			text.Draw(view, "TO BEGIN", fontface, 320-128, 512+(10), color.White)
+			text.Draw(view, "TO START", fontface, 320-128, 512+(10), color.White)
 		case GameStart, GamePause, GameOver:
-			mazeView, mazeViewErr := mazeView(mode, data)
+			mazeView, mazeViewErr := mazeView(state, data)
 			if mazeViewErr != nil {
 				return nil, mazeViewErr
 			}
 			ops.GeoM.Reset()
 			ops.GeoM.Translate(0,
-				-(float64(len(data.Grid)*CellSize) - (GridViewSize + data.GridOffsetY)))
+				-(float64(len(data.Grid)*CellSize) -
+					((GridViewSize) + (data.GridOffsetY))))
 			if drawErr := view.DrawImage(mazeView, ops); drawErr != nil {
 				return nil, drawErr
 			}
@@ -88,11 +97,9 @@ func GridView(characters *resources.Characters, powers *resources.Powers, arcade
 				for j := 0; j < Columns; j++ {
 					if !data.Active[i][j] {
 						ops.GeoM.Reset()
-						ops.GeoM.Translate(
-							float64((j*CellSize)+30),
-							-(float64(((i*CellSize)+
-								(CellSize/2))+2) -
-								(GridViewSize + data.GridOffsetY)))
+						ops.GeoM.Translate(float64((j*CellSize)+30),
+							-(float64(((i*CellSize)+(CellSize/2))+2) -
+								((GridViewSize) + (data.GridOffsetY))))
 						if drawErr := view.DrawImage(dot, ops); drawErr != nil {
 							return nil, drawErr
 						}
@@ -107,36 +114,35 @@ func GridView(characters *resources.Characters, powers *resources.Powers, arcade
 				}
 				pwidth, pheight := powerImg.Size()
 				ops.GeoM.Reset()
-				ops.GeoM.Translate(
-					float64((data.Powers[i].CellX*CellSize)+pwidth/2),
-					-(float64(((data.Powers[i].CellY*CellSize)+
-						(CellSize/2))+pheight/2) - (GridViewSize + data.GridOffsetY)))
+				ops.GeoM.Translate(float64(((data.Powers[i].CellX)*CellSize)+pwidth/2),
+					-(float64((((data.Powers[i].CellY)*CellSize)+(CellSize/2))+pheight/2) -
+						(GridViewSize + (data.GridOffsetY))))
 				if drawErr := view.DrawImage(powerImg, ops); drawErr != nil {
 					return nil, drawErr
 				}
 			}
 			ops.GeoM.Reset()
 			pwidth, pheight := player.Size()
-			switch data.Player.Direction {
+			switch data.Player.Position.Direction {
 			case North:
 				ops.GeoM.Rotate(-1.5708)
 				ops.GeoM.Translate(
-					data.Player.PosX-float64(pwidth/2),
-					GridViewSize-(data.Player.PosY-float64(pheight-(pheight/2))))
+					(data.Player.Position.PosX)-float64(pwidth/2),
+					GridViewSize-((data.Player.Position.PosY)-float64(pheight-(pheight/2))))
 			case East:
 				ops.GeoM.Translate(
-					data.Player.PosX-float64(pwidth/2),
-					GridViewSize-(data.Player.PosY+float64(pheight/2)))
+					(data.Player.Position.PosX)-float64(pwidth/2),
+					GridViewSize-((data.Player.Position.PosY)+float64(pheight/2)))
 			case South:
 				ops.GeoM.Rotate(1.5708)
 				ops.GeoM.Translate(
-					data.Player.PosX+float64(pwidth/2),
-					GridViewSize-(data.Player.PosY+float64(pheight/2)))
+					(data.Player.Position.PosX)+float64(pwidth/2),
+					GridViewSize-((data.Player.Position.PosY)+float64(pheight/2)))
 			case West:
 				ops.GeoM.Rotate(3.14159)
 				ops.GeoM.Translate(
-					data.Player.PosX+float64(pwidth/2),
-					GridViewSize-(data.Player.PosY-float64(pheight-(pheight/2))))
+					(data.Player.Position.PosX)+float64(pwidth/2),
+					GridViewSize-((data.Player.Position.PosY)-float64(pheight-(pheight/2))))
 			}
 			if drawErr := view.DrawImage(player, ops); drawErr != nil {
 				return nil, drawErr
@@ -157,15 +163,14 @@ func GridView(characters *resources.Characters, powers *resources.Powers, arcade
 				if data.Invincible {
 					ops.ColorM.ChangeHSV(0, 0, 1)
 				}
-				ops.GeoM.Translate(
-					data.Ghosts[i].PosX-float64(gwidth/2),
-					(GridViewSize+data.GridOffsetY)-
-						(data.Ghosts[i].PosY+float64(gheight-(gheight/2))))
+				ops.GeoM.Translate((data.Ghosts[i].Position.PosX)-float64(gwidth/2),
+					((GridViewSize)+(data.GridOffsetY))-
+						((data.Ghosts[i].Position.PosY)+float64(gheight-(gheight/2))))
 				if drawErr := view.DrawImage(ghostImg, ops); drawErr != nil {
 					return nil, drawErr
 				}
 			}
-			if mode == GamePause {
+			if state == GamePause {
 				back, backErr := ebiten.NewImage(389, 130, ebiten.FilterDefault)
 				if backErr != nil {
 					return nil, backErr
@@ -180,7 +185,7 @@ func GridView(characters *resources.Characters, powers *resources.Powers, arcade
 				if drawErr := view.DrawImage(back, ops); drawErr != nil {
 					return nil, drawErr
 				}
-			} else if mode == GameOver {
+			} else if state == GameOver {
 				back, backErr := ebiten.NewImage(389, 130, ebiten.FilterDefault)
 				if backErr != nil {
 					return nil, backErr
@@ -188,8 +193,10 @@ func GridView(characters *resources.Characters, powers *resources.Powers, arcade
 				if fillErr := back.Fill(color.Black); fillErr != nil {
 					return nil, fillErr
 				}
+
 				text.Draw(back, "GAME OVER", fontface, 56, 65-(10), color.White)
 				text.Draw(back, "PRESS SPACE", fontface, 24, 65+(10+31), color.White)
+
 				ops.GeoM.Reset()
 				ops.GeoM.Translate(320-(389/2), 512-(130/2))
 				if drawErr := view.DrawImage(back, ops); drawErr != nil {

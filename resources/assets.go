@@ -3,13 +3,14 @@ package resources
 
 import (
 	"bytes"
-	"github.com/golang/freetype/truetype"
-	"github.com/hajimehoshi/ebiten"
 	"image"
 	"image/png"
 	"laberintogenerativo/resources/fonts"
 	"laberintogenerativo/resources/images"
 	"laberintogenerativo/utils"
+
+	"github.com/golang/freetype/truetype"
+	"github.com/hajimehoshi/ebiten"
 )
 
 type SpriteSheet struct {
@@ -42,6 +43,7 @@ type Walls struct {
 
 type Assets struct {
 	ArcadeFont  *truetype.Font
+	Skin        *ebiten.Image
 	Characters  *Characters
 	Powers      *Powers
 	Walls       *Walls
@@ -50,6 +52,10 @@ type Assets struct {
 
 // LoadAssets converts the character images(png, jpg, ...) to ebiten image format and loads fonts.
 func LoadAssets() (*Assets, error) {
+	skin, skinErr := loadSkin()
+	if skinErr != nil {
+		return nil, skinErr
+	}
 
 	font, fontErr := loadArcadeFont()
 	if fontErr != nil {
@@ -73,10 +79,24 @@ func LoadAssets() (*Assets, error) {
 
 	return &Assets{
 		ArcadeFont: font,
+		Skin:       skin,
 		Characters: characters,
 		Powers:     powers,
 		Walls:      walls,
 	}, nil
+}
+func loadSkin() (*ebiten.Image, error) {
+	sImage, sImageErr := png.Decode(bytes.NewReader(images.SkinPng))
+	if sImageErr != nil {
+		return nil, sImageErr
+	}
+
+	skin, skinErr := ebiten.NewImageFromImage(sImage, ebiten.FilterDefault)
+	if skinErr != nil {
+		return nil, skinErr
+	}
+
+	return skin, nil
 }
 func loadArcadeFont() (*truetype.Font, error) {
 	return truetype.Parse(fonts.ArcadeTTF)
@@ -128,7 +148,7 @@ func loadCharacters() (*Characters, error) {
 }
 
 func loadPowers() (*Powers, error) {
-	pImage, pImageErr := png.Decode(bytes.NewReader(images.Spritesheet_png))
+	pImage, pImageErr := png.Decode(bytes.NewReader(images.SpritesheetPng))
 	if pImageErr != nil {
 		return nil, pImageErr
 	}
@@ -197,7 +217,7 @@ func loadWalls() (*Walls, error) {
 
 // LoadSpriteSheet loads the embedded SpriteSheet.
 func LoadSpriteSheet(tileSize int) (*SpriteSheet, error) {
-	img, _, err := image.Decode(bytes.NewReader(images.Spritesheet_png))
+	img, _, err := image.Decode(bytes.NewReader(images.SpritesheetPng))
 	if err != nil {
 		return nil, err
 	}

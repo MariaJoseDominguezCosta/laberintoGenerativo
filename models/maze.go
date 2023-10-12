@@ -7,14 +7,13 @@ import (
 )
 
 // MagicNumber for deciding whether or not to tear down wall between two columns.
-const MagicNumber = 0.7
+const MagicNumber = 0.5
 
 // Columns defines the number of cells in a row in maze.
 const Columns = 10
 
 /*
 Maze represents a maze of size rows x 10.
-Current implementation has been modified to give a non-perfect maze i.e. it can have more than one path between any two cells.
 */
 type Maze struct {
 	maze [][Columns][4]rune
@@ -104,7 +103,7 @@ func (m *Maze) populateRow(row int) {
 				if len(current) > 2 {
 					offset = 2
 				}
-				gates := int(math.Floor(m.rand.Float64()*(float64(len(current))/2)))+offset
+				gates := int(math.Floor(m.rand.Float64()*(float64(len(current))/2))) + offset
 				for j := 0; j < gates; j++ {
 					m.maze[row-1][current[j]][0] = '_'
 					m.maze[row][current[j]][2] = '_'

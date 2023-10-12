@@ -6,7 +6,7 @@ import (
 	"github.com/hajimehoshi/ebiten/inpututil"
 )
 
-func SpacePressed() bool {
+func spacePressed() bool {
 	return inpututil.IsKeyJustPressed(ebiten.KeySpace)
 }
 
@@ -14,7 +14,7 @@ func SpaceReleased() bool {
 	return inpututil.IsKeyJustReleased(ebiten.KeySpace)
 }
 
-func UpKeyPressed() bool {
+func upKeyPressed() bool {
 	return inpututil.IsKeyJustPressed(ebiten.KeyUp)
 }
 
@@ -22,7 +22,7 @@ func UpKeyReleased() bool {
 	return inpututil.IsKeyJustReleased(ebiten.KeyUp)
 }
 
-func DownKeyPressed() bool {
+func downKeyPressed() bool {
 	return inpututil.IsKeyJustPressed(ebiten.KeyDown)
 }
 
@@ -30,7 +30,7 @@ func DownKeyReleased() bool {
 	return inpututil.IsKeyJustReleased(ebiten.KeyDown)
 }
 
-func LeftKeyPressed() bool {
+func leftKeyPressed() bool {
 	return inpututil.IsKeyJustPressed(ebiten.KeyLeft)
 }
 
@@ -38,7 +38,7 @@ func LeftKeyReleased() bool {
 	return inpututil.IsKeyJustReleased(ebiten.KeyLeft)
 }
 
-func RightKeyPressed() bool {
+func rightKeyPressed() bool {
 	return inpututil.IsKeyJustPressed(ebiten.KeyRight)
 }
 

@@ -2,17 +2,17 @@
 package models
 
 import (
+	"github.com/hajimehoshi/ebiten"
 	"laberintogenerativo/resources"
 	"laberintogenerativo/utils"
-	"github.com/hajimehoshi/ebiten"
 )
 
-const MazeViewSize = 1536
+const MazeViewSize = 1540
 const CellSize = 64
 
 func MazeView(
 	walls *resources.Walls,
-) (func(mode Mode, data *Data) (*ebiten.Image, error), error) {
+) (func(state Mode, data *Data) (*ebiten.Image, error), error) {
 	icWallSide, icWallSideErr := utils.ScaleSprite(walls.InActiveSide, 1.0, 1.0)
 	if icWallSideErr != nil {
 		return nil, icWallSideErr
@@ -30,7 +30,7 @@ func MazeView(
 
 	var lastGrid [][Columns][4]rune
 
-	return func(mode Mode, data *Data) (*ebiten.Image, error) {
+	return func(state Mode, data *Data) (*ebiten.Image, error) {
 		if equal, copy := deepEqual(lastGrid, data.Grid); equal {
 			return mazeView, nil
 		} else {
@@ -47,8 +47,7 @@ func MazeView(
 				cellWalls := data.Grid[i][j]
 				if cellWalls[0] == 'N' {
 					ops.GeoM.Reset()
-					ops.GeoM.Translate(float64(j*CellSize)+12,
-						float64(MazeViewSize-((i*CellSize)+CellSize)))
+					ops.GeoM.Translate(float64(j*CellSize)+12, float64(MazeViewSize-((i*CellSize)+CellSize)))
 					if drawErr := mazeView.DrawImage(side, ops); drawErr != nil {
 						return nil, drawErr
 					}
@@ -56,16 +55,14 @@ func MazeView(
 				if cellWalls[1] == 'E' {
 					ops.GeoM.Reset()
 					ops.GeoM.Rotate(1.5708)
-					ops.GeoM.Translate(float64(j*CellSize)+CellSize,
-						float64(MazeViewSize-((i*CellSize)+52)))
+					ops.GeoM.Translate(float64(j*CellSize)+CellSize, float64(MazeViewSize-((i*CellSize)+52)))
 					if drawErr := mazeView.DrawImage(side, ops); drawErr != nil {
 						return nil, drawErr
 					}
 				}
 				if cellWalls[2] == 'S' {
 					ops.GeoM.Reset()
-					ops.GeoM.Translate(float64(j*CellSize)+12,
-						float64(MazeViewSize-((i*CellSize)+12)))
+					ops.GeoM.Translate(float64(j*CellSize)+12, float64(MazeViewSize-((i*CellSize)+12)))
 					if drawErr := mazeView.DrawImage(side, ops); drawErr != nil {
 						return nil, drawErr
 					}
@@ -73,37 +70,32 @@ func MazeView(
 				if cellWalls[3] == 'W' {
 					ops.GeoM.Reset()
 					ops.GeoM.Rotate(1.5708)
-					ops.GeoM.Translate(float64(j*CellSize)+12,
-						float64(MazeViewSize-((i*CellSize)+52)))
+					ops.GeoM.Translate(float64(j*CellSize)+12, float64(MazeViewSize-((i*CellSize)+52)))
 					if drawErr := mazeView.DrawImage(side, ops); drawErr != nil {
 						return nil, drawErr
 					}
 				}
 				// Corners NE
 				ops.GeoM.Reset()
-				ops.GeoM.Translate(float64(j*CellSize)+52,
-					float64(MazeViewSize-((i*CellSize)+CellSize)))
+				ops.GeoM.Translate(float64(j*CellSize)+52, float64(MazeViewSize-((i*CellSize)+CellSize)))
 				if drawErr := mazeView.DrawImage(corner, ops); drawErr != nil {
 					return nil, drawErr
 				}
 				// NW
 				ops.GeoM.Reset()
-				ops.GeoM.Translate(float64(j*CellSize),
-					float64(MazeViewSize-((i*CellSize)+CellSize)))
+				ops.GeoM.Translate(float64(j*CellSize), float64(MazeViewSize-((i*CellSize)+CellSize)))
 				if drawErr := mazeView.DrawImage(corner, ops); drawErr != nil {
 					return nil, drawErr
 				}
 				// SE
 				ops.GeoM.Reset()
-				ops.GeoM.Translate(float64(j*CellSize)+52,
-					float64(MazeViewSize-((i*CellSize)+12)))
+				ops.GeoM.Translate(float64(j*CellSize)+52, float64(MazeViewSize-((i*CellSize)+12)))
 				if drawErr := mazeView.DrawImage(corner, ops); drawErr != nil {
 					return nil, drawErr
 				}
 				// SW
 				ops.GeoM.Reset()
-				ops.GeoM.Translate(float64(j*CellSize),
-					float64(MazeViewSize-((i*CellSize)+12)))
+				ops.GeoM.Translate(float64(j*CellSize), float64(MazeViewSize-((i*CellSize)+12)))
 				if drawErr := mazeView.DrawImage(corner, ops); drawErr != nil {
 					return nil, drawErr
 				}
