@@ -1,6 +1,5 @@
 // laberintogenerativo/models/data.go
 package models
-
 type Direction int
 type powerType int
 type ghostType int
@@ -18,7 +17,6 @@ type Data struct {
 	Direction   Direction
 	Mode        Mode
 }
-
 type Power struct {
 	Position
 	Kind powerType
@@ -35,7 +33,6 @@ type Ghost struct {
 	Position
 	Kind ghostType
 }
-
 const (
 	Ghost1 ghostType = iota
 	Ghost2
@@ -47,7 +44,7 @@ const (
 	GameStart
 	GamePause
 	GameOver
-	OffsetY = CellSize * 10
+	GridOffsetY = (CellSize * 10)
 )
 const (
 	North Direction = iota
@@ -55,7 +52,6 @@ const (
 	South
 	West
 )
-
 func NewData() *Data {
 	return &Data{
 		Lifes: 5,
@@ -63,12 +59,14 @@ func NewData() *Data {
 	}
 }
 func NewGhost(x, y int, Kind ghostType, dir Direction) Ghost {
+	posX := float64((x * CellSize) + CellSize/2)
+	posY := float64((y * CellSize) + CellSize/2)
 	return Ghost{
 		Position{
 			CellX:     x,
 			CellY:     y,
-			PosX:      float64((x * CellSize) + CellSize/2),
-			PosY:      float64((y * CellSize) + CellSize/2),
+			PosX:      posX,
+			PosY:      posY,
 			Direction: dir,
 		}, Kind,
 	}
@@ -121,7 +119,7 @@ func NumOfWalls(walls [4]rune) int {
 }
 func IsIntersection(walls [4]rune) bool {
 	count := NumOfWalls(walls)
-	if (count >= 3) {
+	if count >= 3 {
 		return false
 	} else if count == 2 {
 		// covers the case of corridor
@@ -132,28 +130,21 @@ func IsIntersection(walls [4]rune) bool {
 	return true
 }
 func (g *Data) Keyboard() {
-	if g != nil {
-		walls := g.Grid[g.Player.Position.CellY][g.Player.Position.CellX]
-		if upKeyPressed() {
-			if walls[0] == '_' {
-				g.Player.Position.Direction = North
-			}
-		}
-		if downKeyPressed() {
-			if walls[2] == '_' {
-				g.Player.Position.Direction = South
-			}
-		}
-		if leftKeyPressed() {
-			if walls[3] == '_' {
-				g.Player.Position.Direction = West
-			}
-		}
-		if rightKeyPressed() {
-			if walls[1] == '_' {
-				g.Player.Position.Direction = East
-			}
-		}
+	if g == nil {
+		return
+	}
+	walls := g.Grid[g.Player.Position.CellY][g.Player.Position.CellX]
+	if upKeyPressed() && walls[0] == '_' {
+		g.Direction = North
+	}
+	if downKeyPressed() && walls[2] == '_' {
+		g.Direction = South
+	}
+	if leftKeyPressed() && walls[3] == '_' {
+		g.Direction = West
+	}
+	if rightKeyPressed() && walls[1] == '_' {
+		g.Direction = East
 	}
 }
 func IsDeadend(walls [4]rune) bool {
@@ -179,68 +170,33 @@ func GetExit(walls [4]rune) Direction {
 func IsBlocked(walls [4]rune, dir Direction) bool {
 	switch dir {
 	case North:
-		if walls[0] != '_' {
-			return true
-		}
+		return walls[0] != '_'
 	case East:
-		if walls[1] != '_' {
-			return true
-		}
+		return walls[1] != '_'
 	case South:
-		if walls[2] != '_' {
-			return true
-		}
+		return walls[2] != '_'
 	case West:
-		if walls[3] != '_' {
-			return true
-		}
+		return walls[3] != '_'
 	}
 	return false
 }
 func CanMove(size float64, posX, posY float64, x, y int, walls [4]rune) bool {
-	psx := posX - size
-	psy := posY - size
-	pex := posX + size
-	pey := posY + size
-	sx := x * CellSize
-	sy := y * CellSize
-	ex := sx + CellSize
-	ey := sy + CellSize
-
-	if walls[0] == 'N' {
-		if pey > float64(ey-12) {
-			return false
-		}
-	}
-	if walls[1] == 'E' {
-		if pex > float64(ex-12) {
-			return false
-		}
-	}
-	if walls[2] == 'S' {
-		if psy < float64(sy+12) {
-			return false
-		}
-	}
-	if walls[3] == 'W' {
-		if psx < float64(sx+12) {
-			return false
-		}
-	}
-	// NW corner
-	if pey > float64(ey-12) && psx < float64(sx+12) {
+	switch {
+	case walls[0] == 'N' && posY-size > float64(y*CellSize+12):
 		return false
-	}
-	// NE
-	if pey > float64(ey-12) && pex > float64(ex-12) {
+	case walls[1] == 'E' && posX+size > float64(x*CellSize+CellSize-12):
 		return false
-	}
-	// SW
-	if psy < float64(sy+12) && psx < float64(sx+12) {
+	case walls[2] == 'S' && posY+size < float64(y*CellSize+CellSize-12):
 		return false
-	}
-	// SE
-	if psy < float64(sy+12) && pex > float64(ex-12) {
+	case walls[3] == 'W' && posX-size < float64(x*CellSize+12):
+		return false
+	case posY-size > float64(y*CellSize+12) && posX-size < float64(x*CellSize+12):
+		return false
+	case posY-size > float64(y*CellSize+12) && posX+size > float64(x*CellSize+CellSize-12):
+		return false
+	case posY+size < float64(y*CellSize+CellSize-12) && posX-size < float64(x*CellSize+12):
+		return false
+	case posY+size < float64(y*CellSize+CellSize-12) && posX+size > float64(x*CellSize+CellSize-12):
 		return false
 	}
 	return true

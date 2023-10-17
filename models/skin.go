@@ -52,7 +52,7 @@ func SkinView(
 					score = MaxScoreView
 				}
 				numstr := strconv.Itoa(score)
-				text.Draw(view, numstr, fontface, 682-(len(numstr)*27), 64, color.RGBA{28, 28, 240, 100})
+				text.Draw(view, numstr, fontface, 682-(len(numstr)*27), 64, color.RGBA{200, 150, 240,100})
 
 				if lifes > MaxLifes {
 					lifes = MaxLifes

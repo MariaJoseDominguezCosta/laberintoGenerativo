@@ -10,7 +10,7 @@ import (
 const MagicNumber = 0.5
 
 // Columns defines the number of cells in a row in maze.
-const Columns = 10
+const Columns = 11
 
 /*
 Maze represents a maze of size rows x 10.
@@ -25,7 +25,7 @@ type Maze struct {
 func NewMaze(rows int, src *rand.Rand) *Maze {
 	return &Maze{
 		rand: src,
-		maze: make([][Columns][4]rune, rows),
+		maze: make([][Columns][4]rune, rows, rows),
 		rows: rows,
 	}
 }
@@ -62,7 +62,7 @@ func (m *Maze) Populate() {
 
 // GrowBy extends the grid by given number & creates a valid maze out of new rows.
 func (m *Maze) GrowBy(n int) {
-	m.maze = append(m.maze, make([][Columns][4]rune, n)...)
+	m.maze = append(m.maze, make([][Columns][4]rune, n, n)...)
 	for i := m.rows; i < m.rows+n; i++ {
 		m.populateRow(i)
 	}
@@ -83,7 +83,7 @@ func (m *Maze) Compact(n int) {
 	}
 }
 
-// populateRow initializes the given row, connencts it to previous row and merges columns to create passages.
+// populateRow initializes the given row, connects it to the previous row, and merges columns to create passages.
 func (m *Maze) populateRow(row int) {
 	for i := 0; i < Columns; i++ {
 		m.maze[row][i] = [4]rune{'N', 'E', 'S', 'W'}
@@ -114,13 +114,14 @@ func (m *Maze) populateRow(row int) {
 			}
 		}
 	}
+
 	m.mergeColumns(row)
 }
 
 // mergeColumns decides whether to remove walls between two columns or not, to create horizontal passages in the row.
 func (m *Maze) mergeColumns(row int) {
 	for i := 0; i < Columns-1; i++ {
-		if m.rand.Float32() < MagicNumber {
+		if rand.Float32() < MagicNumber {
 			m.maze[row][i][1] = '_'
 			m.maze[row][i+1][3] = '_'
 		}

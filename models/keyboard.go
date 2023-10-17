@@ -6,10 +6,6 @@ import (
 	"github.com/hajimehoshi/ebiten/inpututil"
 )
 
-func spacePressed() bool {
-	return inpututil.IsKeyJustPressed(ebiten.KeySpace)
-}
-
 func SpaceReleased() bool {
 	return inpututil.IsKeyJustReleased(ebiten.KeySpace)
 }

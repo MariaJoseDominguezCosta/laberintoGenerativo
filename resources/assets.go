@@ -3,23 +3,13 @@ package resources
 
 import (
 	"bytes"
-	"image"
+	"github.com/golang/freetype/truetype"
+	"github.com/hajimehoshi/ebiten"
 	"image/png"
 	"laberintogenerativo/resources/fonts"
 	"laberintogenerativo/resources/images"
 	"laberintogenerativo/utils"
-
-	"github.com/golang/freetype/truetype"
-	"github.com/hajimehoshi/ebiten"
 )
-
-type SpriteSheet struct {
-	Floor  *ebiten.Image
-	Statue *ebiten.Image
-	Tube   *ebiten.Image
-	Crown  *ebiten.Image
-	Portal *ebiten.Image
-}
 
 type Characters struct {
 	Player *ebiten.Image
@@ -42,12 +32,11 @@ type Walls struct {
 }
 
 type Assets struct {
-	ArcadeFont  *truetype.Font
-	Skin        *ebiten.Image
-	Characters  *Characters
-	Powers      *Powers
-	Walls       *Walls
-	SpriteSheet *SpriteSheet
+	ArcadeFont *truetype.Font
+	Skin       *ebiten.Image
+	Characters *Characters
+	Powers     *Powers
+	Walls      *Walls
 }
 
 // LoadAssets converts the character images(png, jpg, ...) to ebiten image format and loads fonts.
@@ -133,7 +122,7 @@ func loadCharacters() (*Characters, error) {
 		return nil, ghost3Err
 	}
 
-	ghost4, ghost4Err := utils.GetSprite(56, 64, 244, 0, characters)
+	ghost4, ghost4Err := utils.GetSprite(56, 64, 190, 0, characters)
 	if ghost4Err != nil {
 		return nil, ghost4Err
 	}
@@ -211,31 +200,4 @@ func loadWalls() (*Walls, error) {
 		InActiveCorner: inactiveCorner,
 		InActiveSide:   inactiveSide,
 	}, nil
-}
-
-//Load Portal load the
-
-// LoadSpriteSheet loads the embedded SpriteSheet.
-func LoadSpriteSheet(tileSize int) (*SpriteSheet, error) {
-	img, _, err := image.Decode(bytes.NewReader(images.SpritesheetPng))
-	if err != nil {
-		return nil, err
-	}
-
-	sheet, _ := ebiten.NewImageFromImage(img, ebiten.FilterDefault)
-
-	// spriteAt returns a sprite at the provided coordinates.
-	spriteAt := func(x, y int) *ebiten.Image {
-		return sheet.SubImage(image.Rect(x*tileSize, (y+1)*tileSize, (x+1)*tileSize, y*tileSize)).(*ebiten.Image)
-	}
-
-	// Populate SpriteSheet.
-	s := &SpriteSheet{}
-	s.Floor = spriteAt(10, 4)
-	s.Statue = spriteAt(5, 4)
-	s.Tube = spriteAt(3, 4)
-	s.Crown = spriteAt(8, 6)
-	s.Portal = spriteAt(5, 6)
-
-	return s, nil
 }

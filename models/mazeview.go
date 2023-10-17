@@ -2,12 +2,12 @@
 package models
 
 import (
-	"github.com/hajimehoshi/ebiten"
 	"laberintogenerativo/resources"
 	"laberintogenerativo/utils"
+	"github.com/hajimehoshi/ebiten"
 )
 
-const MazeViewSize = 1540
+const MazeViewSize = 1536
 const CellSize = 64
 
 func MazeView(
@@ -17,19 +17,15 @@ func MazeView(
 	if icWallSideErr != nil {
 		return nil, icWallSideErr
 	}
-
 	icWallCorner, icWallCornerErr := utils.ScaleSprite(walls.InActiveCorner, 1.0, 1.0)
 	if icWallCornerErr != nil {
 		return nil, icWallCornerErr
 	}
-
-	mazeView, mazeViewErr := ebiten.NewImage(CellSize*(Columns), MazeViewSize, ebiten.FilterDefault)
+	mazeView, mazeViewErr := ebiten.NewImage(CellSize*Columns, MazeViewSize, ebiten.FilterDefault)
 	if mazeViewErr != nil {
 		return nil, mazeViewErr
 	}
-
 	var lastGrid [][Columns][4]rune
-
 	return func(state Mode, data *Data) (*ebiten.Image, error) {
 		if equal, copy := deepEqual(lastGrid, data.Grid); equal {
 			return mazeView, nil
@@ -106,29 +102,26 @@ func MazeView(
 }
 
 func deepEqual(previous, next [][Columns][4]rune) (bool, [][Columns][4]rune) {
-	deepCopy := func(src [][Columns][4]rune) [][Columns][4]rune {
-		copy := make([][Columns][4]rune, 0)
-		for i := 0; i < len(next); i++ {
-			row := [Columns][4]rune{}
-			for j := 0; j < Columns; j++ {
-				row[j] = next[i][j]
-			}
-			copy = append(copy, row)
-		}
-		return copy
-	}
 	if len(previous) != len(next) {
-		return false, deepCopy(next)
+		return false, copySlice(next)
 	}
 	for i := 0; i < len(previous); i++ {
 		if previous[i] != next[i] {
-			return false, deepCopy(next)
+			return false, copySlice(next)
 		}
 		for j := 0; j < Columns; j++ {
 			if previous[i][j] != next[i][j] {
-				return false, deepCopy(next)
+				return false, copySlice(next)
 			}
 		}
 	}
 	return true, next
+}
+
+func copySlice(src [][Columns][4]rune) [][Columns][4]rune {
+	copy := make([][Columns][4]rune, len(src))
+	for i := range src {
+		copy[i] = src[i]
+	}
+	return copy
 }
