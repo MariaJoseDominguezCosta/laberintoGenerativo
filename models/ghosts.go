@@ -1,9 +1,11 @@
 // laberintogenerativo/models/ghosts.go
 package models
+
 import (
 	"math"
 	"math/rand"
 )
+
 func (g *Data) GetGhostDirection(i int) Direction {
 	pacX := float64((g.Player.Position.CellX * CellSize) + (CellSize / 2))
 	pacY := float64((g.Player.Position.CellY * CellSize) + (CellSize / 2))

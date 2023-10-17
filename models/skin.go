@@ -1,14 +1,15 @@
-//laberintogenerativo/models/skin.go
+// laberintogenerativo/models/skin.go
 package models
+
 import (
+	"github.com/golang/freetype/truetype"
+	"github.com/hajimehoshi/ebiten"
+	"github.com/hajimehoshi/ebiten/text"
+	"golang.org/x/image/font"
 	"image/color"
 	"laberintogenerativo/resources"
 	"laberintogenerativo/utils"
 	"strconv"
-	"github.com/golang/freetype/truetype"
-	"golang.org/x/image/font"
-	"github.com/hajimehoshi/ebiten"
-	"github.com/hajimehoshi/ebiten/text"
 )
 
 const MaxScoreView = 999999999
@@ -26,10 +27,14 @@ func SkinView(
 	})
 	width, height := skin.Size()
 	view, viewErr := ebiten.NewImage(width, height, ebiten.FilterDefault)
-	if viewErr != nil {return nil, viewErr}
+	if viewErr != nil {
+		return nil, viewErr
+	}
 
 	life, lifeErr := utils.ScaleSprite(powers.Life, 0.5, 0.5)
-	if lifeErr != nil {return nil, lifeErr}
+	if lifeErr != nil {
+		return nil, lifeErr
+	}
 
 	return func(state Mode, data *Data) (*ebiten.Image, error) {
 		if clearErr := view.Clear(); clearErr != nil {
@@ -52,7 +57,7 @@ func SkinView(
 					score = MaxScoreView
 				}
 				numstr := strconv.Itoa(score)
-				text.Draw(view, numstr, fontface, 682-(len(numstr)*27), 64, color.RGBA{200, 150, 240,100})
+				text.Draw(view, numstr, fontface, 682-(len(numstr)*27), 64, color.RGBA{200, 150, 240, 100})
 
 				if lifes > MaxLifes {
 					lifes = MaxLifes

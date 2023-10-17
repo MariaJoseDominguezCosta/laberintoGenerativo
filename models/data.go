@@ -1,5 +1,6 @@
 // laberintogenerativo/models/data.go
 package models
+
 type Direction int
 type powerType int
 type ghostType int
@@ -33,6 +34,7 @@ type Ghost struct {
 	Position
 	Kind ghostType
 }
+
 const (
 	Ghost1 ghostType = iota
 	Ghost2
@@ -52,6 +54,7 @@ const (
 	South
 	West
 )
+
 func NewData() *Data {
 	return &Data{
 		Lifes: 5,

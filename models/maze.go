@@ -25,7 +25,7 @@ type Maze struct {
 func NewMaze(rows int, src *rand.Rand) *Maze {
 	return &Maze{
 		rand: src,
-		maze: make([][Columns][4]rune, rows, rows),
+		maze: make([][Columns][4]rune, rows),
 		rows: rows,
 	}
 }
@@ -62,7 +62,7 @@ func (m *Maze) Populate() {
 
 // GrowBy extends the grid by given number & creates a valid maze out of new rows.
 func (m *Maze) GrowBy(n int) {
-	m.maze = append(m.maze, make([][Columns][4]rune, n, n)...)
+	m.maze = append(m.maze, make([][Columns][4]rune, n)...)
 	for i := m.rows; i < m.rows+n; i++ {
 		m.populateRow(i)
 	}
@@ -114,7 +114,6 @@ func (m *Maze) populateRow(row int) {
 			}
 		}
 	}
-
 	m.mergeColumns(row)
 }
 

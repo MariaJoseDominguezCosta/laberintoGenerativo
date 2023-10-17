@@ -2,9 +2,9 @@
 package models
 
 import (
+	"github.com/hajimehoshi/ebiten"
 	"laberintogenerativo/resources"
 	"laberintogenerativo/utils"
-	"github.com/hajimehoshi/ebiten"
 )
 
 const MazeViewSize = 1536

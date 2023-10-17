@@ -1,5 +1,6 @@
 // laberintogenerativo/models/player.go
 package models
+
 // Move moves the player to a new position
 func (p *Data) MovePlayer() {
 	speed := 2.0

@@ -93,7 +93,7 @@ func GridView(
 				for j := 0; j < Columns; j++ {
 					if !data.Active[i][j] {
 						ops.GeoM.Reset()
-						ops.GeoM.Translate(float64((j*CellSize)+30),-(float64(((i*CellSize)+(CellSize/2))+2) - (GridViewSize + data.GridOffsetY)))
+						ops.GeoM.Translate(float64((j*CellSize)+30), -(float64(((i*CellSize)+(CellSize/2))+2) - (GridViewSize + data.GridOffsetY)))
 						if drawErr := view.DrawImage(dot, ops); drawErr != nil {
 							return nil, drawErr
 						}
@@ -118,15 +118,15 @@ func GridView(
 			switch data.Player.Position.Direction {
 			case North:
 				ops.GeoM.Rotate(-1.5708)
-				ops.GeoM.Translate( data.Player.Position.PosX-float64(pwidth/2), GridViewSize-(data.Player.Position.PosY-float64(pheight-(pheight/2))))
+				ops.GeoM.Translate(data.Player.Position.PosX-float64(pwidth/2), GridViewSize-(data.Player.Position.PosY-float64(pheight-(pheight/2))))
 			case East:
-				ops.GeoM.Translate( data.Player.Position.PosX-float64(pwidth/2), GridViewSize-(data.Player.Position.PosY+float64(pheight/2)))
+				ops.GeoM.Translate(data.Player.Position.PosX-float64(pwidth/2), GridViewSize-(data.Player.Position.PosY+float64(pheight/2)))
 			case South:
 				ops.GeoM.Rotate(1.5708)
-				ops.GeoM.Translate( data.Player.Position.PosX+float64(pwidth/2), GridViewSize-(data.Player.Position.PosY+float64(pheight/2)))
+				ops.GeoM.Translate(data.Player.Position.PosX+float64(pwidth/2), GridViewSize-(data.Player.Position.PosY+float64(pheight/2)))
 			case West:
 				ops.GeoM.Rotate(3.14159)
-				ops.GeoM.Translate( data.Player.Position.PosX+float64(pwidth/2), GridViewSize-(data.Player.Position.PosY-float64(pheight-(pheight/2))))
+				ops.GeoM.Translate(data.Player.Position.PosX+float64(pwidth/2), GridViewSize-(data.Player.Position.PosY-float64(pheight-(pheight/2))))
 			}
 			if drawErr := view.DrawImage(player, ops); drawErr != nil {
 				return nil, drawErr
@@ -147,7 +147,7 @@ func GridView(
 				if data.Invincible {
 					ops.ColorM.ChangeHSV(0, 0, 1)
 				}
-				ops.GeoM.Translate( data.Ghosts[i].Position.PosX-float64(gwidth/2), (GridViewSize+data.GridOffsetY)-(data.Ghosts[i].Position.PosY+float64(gheight-(gheight/2))))
+				ops.GeoM.Translate(data.Ghosts[i].Position.PosX-float64(gwidth/2), (GridViewSize+data.GridOffsetY)-(data.Ghosts[i].Position.PosY+float64(gheight-(gheight/2))))
 				if drawErr := view.DrawImage(ghostImg, ops); drawErr != nil {
 					return nil, drawErr
 				}
