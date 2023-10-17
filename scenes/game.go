@@ -231,7 +231,7 @@ func (g *Game) update(screen *ebiten.Image) error {
 func (g *Game) Run() error {
 	return ebiten.Run(func(screen *ebiten.Image) error {
 		return g.update(screen)
-	}, 750, 1220, 0.5, "Laberinto Concurrente (Demo)") // scale is kept to 0.5, for good rendering in retina.
+	}, 750, 1220, 0.5, "Laberinto Generativo") // scale is kept to 0.5, for good rendering in retina.
 }
 
 func (g *Game) StartCountdown(duration int) {
